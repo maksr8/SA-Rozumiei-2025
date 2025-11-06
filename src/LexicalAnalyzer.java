@@ -58,6 +58,9 @@ public class LexicalAnalyzer {
         while(true) {
             c = reader.read();
             char ch = (char) c; //for debugging purposes
+            if(ch == ' '){
+                int debug = 0;
+            }
 
             //handle end of file
             if (c == -1) {
@@ -79,7 +82,8 @@ public class LexicalAnalyzer {
 
             Token t = switch (state) {
                 case START -> handleCharForSTART(c);
-                case POINT, HASH, SEMICOLON -> handleOneCharSeparatedAfter(c);
+                case POINT -> handleOneCharSeparatedAfter(c);
+                case HASH, SEMICOLON -> handleOneSeparatorChar(c);
                 case UKRAINIAN_IDENTIFIER -> handleCharForUKRAINIAN_IDENTIFIER(c);
                 case DEF_IDENTIFIER -> handleCharForDEF_IDENTIFIER(c);
                 case INTEGER -> handleCharForINTEGER(c);
@@ -135,7 +139,12 @@ public class LexicalAnalyzer {
         else if ((cls & Transliterator.SEPARATOR) != 0) {
             unreaded = true;
             reader.unread(c);
-            return formToken(KeywordTable.classify(token.toString()));
+            String lexeme = KeywordTable.classify(token.toString());
+            if (lexeme.equals("IDENTIFIER")) {
+                return formToken();
+            } else {
+                return formToken(lexeme);
+            }
         }
         else {
             state = State.ERROR;
@@ -158,7 +167,12 @@ public class LexicalAnalyzer {
         else if ((cls & Transliterator.SEPARATOR) != 0) {
             unreaded = true;
             reader.unread(c);
-            return formToken(KeywordTable.classify(token.toString()));
+            String lexeme = KeywordTable.classify(token.toString());
+            if (lexeme.equals("IDENTIFIER")) {
+                return formToken();
+            } else {
+                return formToken(lexeme);
+            }
         }
         else {
             state = State.ERROR;
@@ -340,6 +354,12 @@ public class LexicalAnalyzer {
         }
 
         return null;
+    }
+
+    private Token handleOneSeparatorChar(int c) throws IOException {
+        unreaded = true;
+        reader.unread(c);
+        return formToken();
     }
 
     private Token handleCharForSTART(int c) throws IOException {

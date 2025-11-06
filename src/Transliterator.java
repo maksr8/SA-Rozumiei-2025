@@ -15,7 +15,7 @@ public enum Transliterator {
     public static final int DOT = 1 << 4;
     public static final int LINE_FEED = 1 << 5;
     public static final int CARRIAGE_RETURN = 1 << 6;
-    public static final int WHITESPACE = (1 << 7) | LINE_FEED | CARRIAGE_RETURN;
+    public static final int WHITESPACE = (1 << 7);
     public static final int INVISIBLE = LINE_FEED | CARRIAGE_RETURN;
     public static final int BRACKET = 1 << 8;
     public static final int SLASH = 1 << 9;
@@ -48,8 +48,6 @@ public enum Transliterator {
         addClass('\r', CARRIAGE_RETURN);
 
         addClass(' ', WHITESPACE);
-        addClass('\n', WHITESPACE);
-        addClass('\r', WHITESPACE);
         addClass('\t', WHITESPACE);
 
         addClass('(', BRACKET);

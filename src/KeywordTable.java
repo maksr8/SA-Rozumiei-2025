@@ -1,20 +1,16 @@
-import java.util.Set;
+import java.util.Map;
 
 public class KeywordTable {
-    private static final Set<String> KEYWORDS = Set.of(
-            "рівнобедрений",
-            "прямокутний"
-    );
-    private static final Set<String> BUILTIN_FUNCTIONS = Set.of(
-            "побудувати_трикутник",
-            "побудувати_висоту",
-            "побудувати_медіану",
-            "побудувати_бісектрису"
+    private static final Map<String, String> LEXEME_TO_TOKEN_TYPE = Map.ofEntries(
+            Map.entry("рівнобедрений", "KEYWORD_ISOSCELES"),
+            Map.entry("прямокутний", "KEYWORD_RIGHT"),
+            Map.entry("побудувати_трикутник", "KEYWORD_BUILD_TRIANGLE"),
+            Map.entry("побудувати_висоту", "KEYWORD_BUILD_HEIGHT"),
+            Map.entry("побудувати_медіану", "KEYWORD_BUILD_MEDIAN"),
+            Map.entry("побудувати_бісектрису", "KEYWORD_BUILD_BISECTOR")
     );
 
     public static String classify(String lexeme) {
-        if (KEYWORDS.contains(lexeme)) return "KEYWORD";
-        if (BUILTIN_FUNCTIONS.contains(lexeme)) return "BUILTIN_FUNC";
-        return "DEF_IDENTIFIER";
+        return LEXEME_TO_TOKEN_TYPE.getOrDefault(lexeme, "IDENTIFIER");
     }
 }
