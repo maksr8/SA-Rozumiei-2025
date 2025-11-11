@@ -1,12 +1,12 @@
 public class Token {
-    private final String type;
+    private final TokenType type;
     private final String value;
     private final int startLine;
     private final int startColumn;
     private final int endLine;
     private final int endColumn;
 
-    public Token(String type, String value, int startLine, int startColumn, int endLine, int endColumn) {
+    public Token(TokenType type, String value, int startLine, int startColumn, int endLine, int endColumn) {
         this.type = type;
         this.value = value;
         this.startLine = startLine;
@@ -17,6 +17,22 @@ public class Token {
 
     @Override
     public String toString() {
-        return '[' + type + " \"" + value + "\" (" + startLine + " " + startColumn + ") (" + endLine + " " + endColumn + ")]";
+        return '[' + type.name() + " \"" + value + "\" (" + startLine + " " + startColumn + ") (" + endLine + " " + endColumn + ")]";
+    }
+
+    public TokenType getType() {
+        return type;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public int getStartLine() {
+        return startLine;
+    }
+
+    public int getStartColumn() {
+        return startColumn;
     }
 }

@@ -58,9 +58,6 @@ public class LexicalAnalyzer {
         while(true) {
             c = reader.read();
             char ch = (char) c; //for debugging purposes
-            if(ch == ' '){
-                int debug = 0;
-            }
 
             //handle end of file
             if (c == -1) {
@@ -139,11 +136,11 @@ public class LexicalAnalyzer {
         else if ((cls & Transliterator.SEPARATOR) != 0) {
             unreaded = true;
             reader.unread(c);
-            String lexeme = KeywordTable.classify(token.toString());
-            if (lexeme.equals("IDENTIFIER")) {
+            TokenType type = KeywordTable.classify(token.toString());
+            if (type == TokenType.IDENTIFIER) {
                 return formToken();
             } else {
-                return formToken(lexeme);
+                return formToken(type);
             }
         }
         else {
@@ -167,11 +164,11 @@ public class LexicalAnalyzer {
         else if ((cls & Transliterator.SEPARATOR) != 0) {
             unreaded = true;
             reader.unread(c);
-            String lexeme = KeywordTable.classify(token.toString());
-            if (lexeme.equals("IDENTIFIER")) {
+            TokenType type = KeywordTable.classify(token.toString());
+            if (type == TokenType.IDENTIFIER) {
                 return formToken();
             } else {
-                return formToken(lexeme);
+                return formToken(type);
             }
         }
         else {
@@ -418,16 +415,33 @@ public class LexicalAnalyzer {
 
     // for cases when we form token when meet separator
     private Token formToken() {
-        return new Token(state.toString(), token.toString(), startLine, startColumn, line, column);
+        return new Token(mapStateToTokenType(state), token.toString(), startLine, startColumn, line, column);
     }
 
     // for cases when we form token right after appending the last symbol
     private Token formTokenNextColEnd() {
-        return new Token(state.toString(), token.toString(), startLine, startColumn, line, column+1);
+        return new Token(mapStateToTokenType(state), token.toString(), startLine, startColumn, line, column+1);
     }
 
-    private Token formToken(String lexeme) {
-        return new Token(lexeme, token.toString(), startLine, startColumn, line, column);
+    private Token formToken(TokenType type) {
+        return new Token(type, token.toString(), startLine, startColumn, line, column);
+    }
+
+    private TokenType mapStateToTokenType(State state) {
+        return switch (state) {
+            case POINT -> TokenType.POINT;
+            case DEF_IDENTIFIER -> TokenType.DEF_IDENTIFIER;
+            case UKRAINIAN_IDENTIFIER -> TokenType.UKRAINIAN_IDENTIFIER;
+            case INTEGER -> TokenType.INTEGER;
+            case FLOAT -> TokenType.FLOAT;
+            case SINGLE_LINE_COMMENT -> TokenType.SINGLE_LINE_COMMENT;
+            case MULTI_LINE_COMMENT -> TokenType.MULTI_LINE_COMMENT;
+            case OPERATOR -> TokenType.OPERATOR;
+            case BRACKET -> TokenType.BRACKET;
+            case HASH -> TokenType.HASH;
+            case SEMICOLON -> TokenType.SEMICOLON;
+            default -> TokenType.ERROR;
+        };
     }
 
 }
