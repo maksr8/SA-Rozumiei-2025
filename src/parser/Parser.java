@@ -1,4 +1,16 @@
+package parser;
+
+import ast.ASTNode;
+import ast.BuildSegmentNode;
+import ast.BuildTriangleNode;
+import ast.ProgramNode;
+import lexer.LexicalAnalyzer;
+import lexer.Token;
+import lexer.TokenType;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Parser {
     private final LexicalAnalyzer lexer;
@@ -28,30 +40,33 @@ public class Parser {
         }
     }
 
-    public void parse() throws Exception {
-        parseSentenceList();
+    public ProgramNode parse() throws Exception {
+        ProgramNode program = parseSentenceList();
         match(TokenType.HASH);
         System.out.println("Syntax analysis completed successfully.");
+        return program;
     }
 
-    private void parseSentenceList() throws Exception {
+    private ProgramNode parseSentenceList() throws Exception {
+        List<ASTNode> sentences = new ArrayList<>();
         while (currentToken != null && !(currentToken.getType() == TokenType.HASH)) {
-            parseSentence();
+            sentences.add(parseSentence());
             match(TokenType.SEMICOLON);
         }
+        return new ProgramNode(sentences);
     }
 
-    private void parseSentence() throws Exception {
+    private ASTNode parseSentence() throws Exception {
         if (currentToken == null) {
             throw new Exception("Syntax Error: Unexpected eof, expected a sentence.");
         }
         TokenType type = currentToken.getType();
         if (type == TokenType.KEYWORD_BUILD_TRIANGLE) {
-            parseTriangle();
+            return parseTriangle();
         } else if (type == TokenType.KEYWORD_BUILD_HEIGHT ||
                 type == TokenType.KEYWORD_BUILD_MEDIAN ||
                 type == TokenType.KEYWORD_BUILD_BISECTOR) {
-            parseSegment();
+            return parseSegment();
         } else {
             throw new Exception("Syntax Error: Unexpected token " + type +
                     " at " + currentToken.getStartLine() + ":" + currentToken.getStartColumn() +
@@ -59,64 +74,60 @@ public class Parser {
         }
     }
 
-    private void parseTriangle() throws Exception {
+    private BuildTriangleNode parseTriangle() throws Exception {
         match(TokenType.KEYWORD_BUILD_TRIANGLE);
-        System.out.println("Parsing: Found BUILD_TRIANGLE command.");
-
+        TokenType type = null;
         if (currentToken.getType() == TokenType.KEYWORD_ISOSCELES ||
                 currentToken.getType() == TokenType.KEYWORD_RIGHT) {
-            parseTriangleType();
+            type = parseTriangleType();
         }
 
-        parseTriangleName();
+        Token p1 = currentToken;
+        match(TokenType.POINT);
+        Token p2 = currentToken;
+        match(TokenType.POINT);
+        Token p3 = currentToken;
+        match(TokenType.POINT);
+
+        return new BuildTriangleNode(type, p1, p2, p3);
     }
 
-    private void parseTriangleType() throws Exception {
+    private TokenType parseTriangleType() throws Exception {
         if (currentToken.getType() == TokenType.KEYWORD_ISOSCELES) {
             match(TokenType.KEYWORD_ISOSCELES);
-            System.out.println("Parsing: Found modifier ISOSCELES.");
+            return TokenType.KEYWORD_ISOSCELES;
         } else {
             match(TokenType.KEYWORD_RIGHT);
-            System.out.println("Parsing: Found modifier RIGHT.");
+            return TokenType.KEYWORD_RIGHT;
         }
     }
 
-    private void parseTriangleName() throws Exception {
+    private BuildSegmentNode parseSegment() throws Exception {
+        TokenType segmentType = parseSegmentType();
+        Token p1 = currentToken;
         match(TokenType.POINT);
+        Token p2 = currentToken;
         match(TokenType.POINT);
-        match(TokenType.POINT);
-        System.out.println("Parsing: Found triangle name (3 points).");
+
+        return new BuildSegmentNode(segmentType, p1, p2);
     }
 
-    private void parseSegment() throws Exception {
-        parseSegmentType();
-        parseSegmentName();
-    }
-
-    private void parseSegmentType() throws Exception {
+    private TokenType parseSegmentType() throws Exception {
         TokenType type = currentToken.getType();
 
         switch (type) {
             case TokenType.KEYWORD_BUILD_HEIGHT:
                 match(TokenType.KEYWORD_BUILD_HEIGHT);
-                System.out.println("Parsing: Found BUILD_HEIGHT command.");
                 break;
             case TokenType.KEYWORD_BUILD_MEDIAN:
                 match(TokenType.KEYWORD_BUILD_MEDIAN);
-                System.out.println("Parsing: Found BUILD_MEDIAN command.");
                 break;
             case TokenType.KEYWORD_BUILD_BISECTOR:
                 match(TokenType.KEYWORD_BUILD_BISECTOR);
-                System.out.println("Parsing: Found BUILD_BISECTOR command.");
                 break;
             default:
-                throw new Exception("Internal Parser Error: Unexpected segment type " + type);
+                throw new Exception("Internal parser.Parser Error: Unexpected segment type " + type);
         }
-    }
-
-    private void parseSegmentName() throws Exception {
-        match(TokenType.POINT);
-        match(TokenType.POINT);
-        System.out.println("Parsing: Found segment name (2 points).");
+        return type;
     }
 }

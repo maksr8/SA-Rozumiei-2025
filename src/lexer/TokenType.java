@@ -1,3 +1,5 @@
+package lexer;
+
 public enum TokenType {
     KEYWORD_BUILD_TRIANGLE,
     KEYWORD_BUILD_HEIGHT,
