@@ -37,7 +37,7 @@ public class SymbolTable {
         } else if (type == TokenType.KEYWORD_RIGHT) {
             p1 = new Point(p1Name, 100.0 + offsetX, 400.0 + offsetY);
             p2 = new Point(p2Name, 100.0 + offsetX, 100.0 + offsetY);
-            p3 = new Point(p3Name, 400.0 + offsetX, 400.0 + offsetY);
+            p3 = new Point(p3Name, 500.0 + offsetX, 400.0 + offsetY);
         } else {
             double baseX1 = 100.0;
             double baseY1 = 400.0;
