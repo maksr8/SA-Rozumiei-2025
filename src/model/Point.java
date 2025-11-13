@@ -1,4 +1,4 @@
-package interpreter;
+package model;
 
 public class Point {
     private final String name;
@@ -25,6 +25,6 @@ public class Point {
 
     @Override
     public String toString() {
-        return "interpreter.Point(" + name + ": " + x + ", " + y + ")";
+        return String.format("Point[%s(%.1f, %.1f)]", name, x, y);
     }
 }
